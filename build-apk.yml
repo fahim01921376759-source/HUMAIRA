@@ -1,0 +1,71 @@
+name: Build HUMAIRA APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Finds the Android project and stops with a clear message if any file was not uploaded.
+      - name: Locate and verify project files
+        id: loc
+        run: |
+          FILE=$(find . -maxdepth 3 -name settings.gradle.kts -not -path './.git/*' | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "ERROR: settings.gradle.kts was not uploaded to GitHub."
+            find . -path ./.git -prune -o -type f -print | head -200
+            exit 1
+          fi
+          DIR=$(dirname "$FILE")
+          echo "Project folder: $DIR"
+          MISSING=0
+          for f in build.gradle.kts gradle.properties \
+                   app/build.gradle.kts app/src/main/AndroidManifest.xml \
+                   app/src/main/java/com/humaira/app/MainActivity.kt \
+                   app/src/main/res/layout/activity_main.xml; do
+            if [ ! -f "$DIR/$f" ]; then
+              echo "MISSING FILE: $f"
+              MISSING=1
+            fi
+          done
+          if [ "$MISSING" = "1" ]; then
+            echo "The files above were not uploaded. Files currently in the repository:"
+            find . -path ./.git -prune -o -type f -print | head -200
+            exit 1
+          fi
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      # Creates gradlew, gradlew.bat and gradle/wrapper/* (including the .jar) inside the project.
+      - name: Generate Gradle wrapper
+        working-directory: ${{ steps.loc.outputs.dir }}
+        run: |
+          gradle wrapper --gradle-version 8.7 --no-daemon
+          chmod +x gradlew
+
+      - name: Build debug APK
+        working-directory: ${{ steps.loc.outputs.dir }}
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HUMAIRA-apk
+          path: ${{ steps.loc.outputs.dir }}/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

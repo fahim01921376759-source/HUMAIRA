@@ -11,26 +11,25 @@ The easiest way to get the APK (the installable app file) is to let GitHub build
 ---------------------------------------------------------------
 
 1. Create a free account at https://github.com (skip if you have one).
-2. Click the "+" at the top right -> "New repository".
-   Name it `humaira`, keep it Private, click "Create repository".
-3. Unzip HUMAIRA.zip on your computer.
-4. On the new repository page click "uploading an existing file".
-   Open the unzipped HUMAIRA folder, select EVERYTHING inside it
-   (the `app` folder, `.github` folder, and all the files) and drag it into the browser.
-   Wait until the upload finishes, then click "Commit changes".
+2. Click "+" (top right) -> "New repository". Name it `humaira`, click "Create repository".
+3. Unzip HUMAIRA-fixed.zip. Open the unzipped folder: you should see
+   `app`, `gradle`, `.github`, `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`,
+   `gradlew`, `gradlew.bat`, `build-apk.yml`, `START_HERE.md`.
+4. On the repository page click "uploading an existing file". Select EVERYTHING inside that
+   folder (not the folder itself) and drag it into the browser. Wait for the upload to finish,
+   then click "Commit changes".
+   The `app` folder MUST be uploaded with everything inside it
+   (it contains `build.gradle.kts` and `src`). The build tells you by name if a file is missing.
 
-   If your computer hides the `.github` folder and it does not upload:
-   - In the repository click "Add file" -> "Create new file".
-   - In the name box type exactly:  .github/workflows/build-apk.yml
-   - Open `build-apk.yml` from the HUMAIRA folder, copy all of it, paste it in, click "Commit changes".
+   If `.github` (hidden on some computers) did not upload:
+   "Add file" -> "Create new file" -> type exactly `.github/workflows/build-apk.yml`
+   -> paste the contents of `build-apk.yml` -> "Commit changes".
 
-5. Click the "Actions" tab. A job called "Build HUMAIRA APK" starts by itself.
-   Wait 3-6 minutes until it shows a green check mark.
-   (If it does not start, click "Build HUMAIRA APK" on the left -> "Run workflow".)
-6. Click the finished job -> scroll down to "Artifacts" -> click "HUMAIRA-apk".
-   It downloads a zip. Unzip it to get `app-debug.apk`.
+5. Click the "Actions" tab. "Build HUMAIRA APK" starts by itself (3-6 minutes).
+   If it does not: click it on the left -> "Run workflow".
+6. When it is green, open it -> "Artifacts" -> download `HUMAIRA-apk`, unzip -> `app-debug.apk`.
 
-If the job shows a red X: open it, copy the red error text, and send it to Claude. It will be fixed.
+If it fails, open the failed step, copy the red text and send it to Claude.
 
 ---------------------------------------------------------------
 ## PART 2 - Install on your phone
